@@ -28,7 +28,7 @@ end -- }}}
 function M.global_variables() -- {{{
 	-- if some configs are missing here, check .editorconfig and .stylua.toml
 	vim.g.var = "alpPrj"
-	vim.g.python3_host_prog = os.getenv('ASDF_DATA_DIR') .. "/python"
+	vim.g.python3_host_prog = os.getenv("ASDF_DATA_DIR") .. "/python"
 	vim.g.mapleader = ";" -- vim.keycode('<Space>')
 	vim.g.localmapleader = vim.g.mapleader
 end -- }}}

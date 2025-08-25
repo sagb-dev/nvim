@@ -1,7 +1,7 @@
 vim.defer_fn(function()
 	-- 1 accelerated-jk
 	vim.pack.add({ { src = "https://github.com/rainbowhxch/accelerated-jk.nvim" } })
-	require('accelerated-jk').setup({
+	require("accelerated-jk").setup({
 		enable_deceleration = true,
 	})
 	vim.api.nvim_set_keymap("n", "j", "<Plug>(accelerated_jk_gj)", {})
@@ -52,7 +52,13 @@ vim.defer_fn(function()
 
 	-- 8 telescope
 	vim.pack.add({ { src = "https://github.com/nvim-telescope/telescope.nvim" } })
-	require("telescope").setup({})
+	require("telescope").setup({
+		pickers = {
+			find_files = {
+				find_command = { "rg", "--ignore", "-L", "--hidden", "--files" },
+			},
+		},
+	})
 	local builtin = require("telescope.builtin")
 	vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Telescope find files" })
 	vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Telescope live grep" })
