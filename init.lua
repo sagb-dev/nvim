@@ -160,7 +160,7 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufReadPost" }, {
 	callback = function()
 		local mark = vim.api.nvim_buf_get_mark(0, '"')
 		if mark[1] > 0 and mark[1] <= vim.api.nvim_buf_line_count(0) then
-			if vim.o.filetype == 'help' then
+			if vim.o.filetype == "help" then
 				return
 			end
 			vim.api.nvim_win_set_cursor(0, mark)
