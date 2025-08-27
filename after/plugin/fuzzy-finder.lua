@@ -32,5 +32,11 @@ vim.api.nvim_create_autocmd("PackChanged", {
 })
 
 vim.pack.add({ { src = "https://github.com/dmtrKovalenko/fff.nvim" } })
-vim.g.fff = { lazy_sync = true }
+vim.g.fff = {
+	lazy_sync = true,
+	debug = {
+		enabled = false,
+		show_scores = false,
+	},
+}
 require("fff").setup()
