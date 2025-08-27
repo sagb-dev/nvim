@@ -1,11 +1,5 @@
 local M = {}
 
---- @return function
-function M.setup()
-	vim.notify = M.notify_send
-	return vim.notify
-end
-
 --- @param level integer
 --- @return string
 function M.get_urgency(level)
@@ -41,6 +35,12 @@ function M.notify_send(msg, level)
 	})
 end
 
-vim.schedule(M.setup)
+--- @return function
+function M.setup()
+	vim.notify = M.notify_send
+	return vim.notify
+end
+
+vim.defer_fn(M.setup, 1000)
 
 return M

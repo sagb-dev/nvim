@@ -1,172 +1,204 @@
 vim.loader.enable()
 
-local M = {}
-local map = vim.keymap.set
-local set = vim.opt
-local opts = { silent = true }
-local au = vim.api.nvim_create_autocmd
+-- Command line abbreviations
+vim.cmd.cabbrev("Q q")
+vim.cmd.cabbrev("W w")
+vim.cmd.cabbrev("WQ wq")
+vim.cmd.cabbrev("Wqa wqa")
 
-M.disabled_keys = { -- {{{
-	"<Space>",
-	"<Down>",
-	"<Up>",
-	"<Left>",
-	"<Right>",
-	"<Backspace>",
-	"<Enter>",
-	"<CR>",
-} -- }}}
+vim.opt.fillchars:append({
+	-- eob = "␗", -- End-of -Transmission-Block
+	eob = " ",
+	horiz = "━",
+	horizup = "┻",
+	horizdown = "┳",
+	vert = "┃",
+	vertleft = "┫",
+	vertright = "┣",
+	verthoriz = "╋",
+	fold = " ",
+	diff = "─",
+	msgsep = "‾",
+	foldsep = "│",
+	foldopen = "▾",
+	foldclose = "▸",
+})
+vim.opt.listchars:append({
+	tab = "▸ ",
+	-- tab = "» ",
+	-- tab = "!·",
+	trail = "·",
+	nbsp = "␣",
+	-- eol = "↲",
+})
+vim.opt.whichwrap:append("<>[]hl~")
+vim.opt.backupdir:remove({ "." })
+vim.opt.cinkeys:remove(":")
+vim.opt.grepformat:append("%f:%l:%c:%m")
+-- if you make use of `n` in cpsetions and virtual_lines you'll have to modify
+-- the format of the diagnostics displayed by virtual_lines
+-- vim.opt.cpoptions:append("n")
+vim.opt.showbreak = "↪ "
+vim.opt.breakindent = true
+vim.opt.clipboard = "unnamedplus"
+vim.opt.colorcolumn = tostring(80)
+vim.opt.conceallevel = 1
+vim.opt.copyindent = true
+vim.opt.formatoptions = vim.opt.formatoptions + "r" + "c" + "q" + "j" - "t" - "a" - "o" - tostring(2)
+vim.opt.grepprg = "rg --vimgrep --no-heading --smart-case"
+vim.opt.hlsearch = true -- if true, clear with <C-l>
+vim.opt.ignorecase = true
+vim.opt.inccommand = "split"
+vim.opt.incsearch = true
+vim.opt.infercase = true
+vim.opt.joinspaces = false
+vim.opt.lazyredraw = false
+vim.opt.linebreak = true
+vim.opt.list = true
+vim.opt.mouse = "a"
+vim.opt.preserveindent = true
+vim.opt.scrolloff = 9999
+vim.opt.sidescrolloff = 9999
+-- vim.opt.scrolljump = -50 -- scroll like emacs
+vim.opt.sessionoptions = {
+	"blank",
+	"buffers",
+	"curdir",
+	"folds",
+	"globals",
+	"help",
+	"options",
+	"resize",
+	"tabpages",
+	"terminal",
+	"winpos",
+	"winsize",
+}
+vim.opt.shiftround = true
+vim.opt.showcmd = false
+vim.opt.smartcase = true
+vim.opt.smartindent = true
+vim.opt.smarttab = true
+vim.opt.smoothscroll = true
+-- vim.opt.spelllang = "en,es"
+-- vim.opt.spelloptions = "camel,noplainbuffer"
+-- vim.opt.spellsuggest = "best," .. tostring(6)
+vim.opt.splitbelow = true
+vim.opt.splitright = true
+vim.opt.startofline = true
 
-function M.colorscheme() -- {{{
-	vim.pack.add({ "https://github.com//miikanissi/modus-themes.nvim" })
-	require("modus-themes").setup()
-	vim.cmd.colorscheme("modus")
-	vim.api.nvim_set_hl(0, "Visual", { reverse = true })
-	vim.opt.termguicolors = true
-end -- }}}
+-- Default values, ignored in this config because of .editorconfig
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = vim.o.tabstop
 
-function M.global_variables() -- {{{
-	-- if some configs are missing here, check .editorconfig and .stylua.toml
-	vim.g.var = "alpPrj"
-	vim.g.python3_host_prog = os.getenv("ASDF_DATA_DIR") .. "/python"
-	vim.g.mapleader = ";" -- vim.keycode('<Space>')
-	vim.g.localmapleader = vim.g.mapleader
-end -- }}}
+vim.opt.timeoutlen = 600
+vim.opt.title = true
+vim.opt.titlelen = 0
+vim.opt.ttimeoutlen = 10
+vim.opt.undofile = true
+vim.opt.updatetime = 300
+vim.opt.virtualedit = "block" -- all
+-- vim.opt.winborder = "rounded"
 
-function M.completion() -- {{{
-	-- TODO: I still don't get how the builtin completion works in neovim
-	-- https://gpanders.com/blog/whats-new-in-neovim-0-11/#breaking-changes
-	--
-	-- Quick intro to builtin completion:
-	-- In insert mode, <C-x> changes to completion mode
-	-- To navigate, <C-n> and <C-p>
-	-- <C-x><C-f> file name
-	-- <C-x><C-l> whole line copying
-	-- <C-x><C-n> buffer words, but remapped to <C-x><C-b>
-	-- <C-x><C-k> dictionary
-	-- <C-x><C-t> thesaurus completion
-	-- <C-x><C-o> omni completion, now defaults to LSP as a source since 0.11
-	-- <C-x><C-u> user defined completion, don't know how its used
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.numberwidth = 1
+vim.opt.foldcolumn = "auto:" .. tostring(1)
+vim.opt.signcolumn = "yes:" .. tostring(1)
 
-	vim.pack.add({
-		{ src = "https://github.com/L3MON4D3/LuaSnip" },
-		{ src = "https://github.com/rafamadriz/friendly-snippets" },
-	})
-	vim.opt.autocomplete = true
-	vim.opt.complete = "o,.,w,b,u"
-	vim.opt.completeopt = { "fuzzy", "preview", "popup", "menuone", "noinsert", "noselect" }
-	vim.api.nvim_create_autocmd("LspAttach", {
-		callback = function(ev)
-			require("luasnip.loaders.from_vscode").lazy_load()
-			local client = vim.lsp.get_client_by_id(ev.data.client_id)
-			if client == nil then
+vim.opt.swapfile = false
+vim.opt.backup = true
+vim.opt.backupcopy = "yes"
+
+-- no statusline, anywhere
+vim.api.nvim_set_hl(0, "StatusLine", { link = "Normal" })
+vim.api.nvim_set_hl(0, "StatusLineNC", { link = "Normal" })
+vim.opt.cmdheight = 0
+vim.opt.laststatus = 0
+vim.opt.statusline = "%{repeat('─',winwidth('.'))}"
+
+vim.api.nvim_create_autocmd({ "InsertLeave", "CmdlineLeave" }, {
+	callback = function()
+		vim.opt.relativenumber = true
+	end,
+})
+
+vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
+	callback = function()
+		vim.opt.relativenumber = false
+	end,
+})
+
+vim.opt.autowrite = true
+vim.opt.autowriteall = true
+vim.api.nvim_create_autocmd("FocusLost", {
+	callback = function()
+		local skip_filetypes = {
+			[""] = true,
+			["*"] = true,
+			help = true,
+			netrw = true,
+			vim = true,
+		}
+
+		if skip_filetypes[vim.bo.filetype] then
+			return
+		end
+
+		vim.cmd.write()
+	end,
+})
+
+-- NetRW
+vim.g.netrw_liststyle = 3
+vim.g.netrw_banner = 0
+vim.g.netrw_winsize = 20 -- I should improve this to be dynamic
+vim.g.netrw_browse_split = 4 -- open files in previous window
+vim.g.netrw_altv = 1
+
+vim.api.nvim_create_autocmd({ "BufEnter", "BufReadPost" }, {
+	callback = function()
+		local mark = vim.api.nvim_buf_get_mark(0, '"')
+		if mark[1] > 0 and mark[1] <= vim.api.nvim_buf_line_count(0) then
+			if vim.o.filetype == 'help' then
 				return
 			end
+			vim.api.nvim_win_set_cursor(0, mark)
+		end
+	end,
+})
 
-			if client:supports_method("textDocument/completion") then
-				vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
-			end
-		end,
-	})
+vim.api.nvim_create_autocmd("BufWritePre", {
+	callback = function(event)
+		local dir = vim.fn.fnamemodify(event.match, ":p:h")
+		if vim.fn.isdirectory(dir) == 0 then
+			vim.fn.mkdir(dir, "p")
+		end
+	end,
+})
 
-	vim.keymap.set("i", "<C-x><C-b>", "<C-x><C-n>", { noremap = true })
-end -- }}}
+vim.api.nvim_create_autocmd("TextYankPost", {
+	callback = function()
+		vim.highlight.on_yank()
+	end,
+})
 
-function M.keymaps() -- {{{
-	map("n", "j", function()
-		return tonumber(vim.api.nvim_get_vvar("count")) > 0 and "j" or "gj"
-	end, { expr = true, silent = true }) -- Move down, but use 'gj' if no count is given
-	map("n", "k", function()
-		return tonumber(vim.api.nvim_get_vvar("count")) > 0 and "k" or "gk"
-	end, { expr = true, silent = true }) -- Move up, but use 'gk' if no count is given
-	map("v", "J", ":m '>+1<cr>gv=gv", opts) -- Move line blacks of any visual selection around
-	map("v", "K", ":m '<-2<cr>gv=gv", opts)
-	map("n", "J", "mzJ`z", opts)
-	map("v", ">", ">gv", opts) -- Keep the visual selection after using < or > motions
-	map("v", "<", "<gv", opts)
-	map("n", "//", "/<Up>", opts) -- Go to last searched term
-	map("n", "<Tab>", vim.cmd.bnext)
-	map("n", "<S-Tab>", vim.cmd.bprevious)
-	map("n", "d<Tab>", vim.cmd.bdelete)
-	map("n", "<Leader>w", function()
-		set.wrap = not vim.o.wrap
-	end)
-	map("n", "n", "nzzzv", opts)
-	map("n", "N", "Nzzzv", opts)
-	map("n", "#", "*N", opts) -- Simplify search, tbh it doesn't make much sense to search up or down for me
-	map("n", "*", "*N", opts)
-	map("i", ",", ",<C-g>u", opts) -- add break-points to undolist
-	map("i", ".", ".<C-g>u", opts)
-	map("i", "!", "!<C-g>u", opts)
-	map("i", "?", "?<C-g>u", opts)
-	map("n", "<Leader>cd", function()
-		vim.fn.chdir(vim.fn.expand("%:p:h"))
-	end, { unpack(opts), desc = "Change directory to the current file's directory" })
-	-- TODO: I need to check if this works
-	-- map("v", "<Leader>p", '"_dP') -- Paste without overwriting the default register
-	if not vim.o.clipboard == "unnamedplus" then
-		map({ "n", "x", "o" }, "gy", '"+y', { unpack(opts), desc = "Copy to clipboard" })
-		map({ "n", "x", "o" }, "gp", '"+p', { unpack(opts), desc = "Paste clipboard text" })
-	end
-	map({ "n", "x", "o" }, "<C-l>", function()
-		set.hlsearch = not vim.o.hlsearch and true
-	end, { unpack(opts), desc = "Extend the default <C-l> keybind to work as a toggle" })
-end -- }}}
+vim.api.nvim_create_autocmd("BufWritePre", {
+	callback = function()
+		local save_cursor = vim.fn.getpos(".")
+		vim.cmd([[%s/\s\+$//e]])
+		vim.fn.setpos(".", save_cursor)
+	end,
+})
 
-function M.keymaps_lsp() -- {{{
-	au("LspAttach", {
-		callback = function(args)
-			local lsp_opts = {
-				buffer = args.buf,
-				silent = true,
-			}
+vim.api.nvim_create_autocmd("VimResized", { command = "wincmd =" })
+vim.api.nvim_create_autocmd("BufWinEnter", { command = "checktime" })
+vim.api.nvim_create_autocmd({ "BufWinLeave" }, { command = "silent! mkview" })
+vim.api.nvim_create_autocmd({ "BufWinEnter" }, { command = "silent! loadview" })
 
-			local qf_opts = {
-				buffer = args.buf,
-				silent = true,
-			}
-
-			map("n", "gD", vim.lsp.buf.declaration, lsp_opts)
-			map("n", "gd", vim.lsp.buf.definition, lsp_opts)
-			map("n", "<CR>", vim.lsp.buf.signature_help, lsp_opts)
-			map("n", "gI", vim.lsp.buf.implementation, lsp_opts)
-			map("n", "gr", vim.lsp.buf.references, lsp_opts)
-			map("n", "gl", vim.diagnostic.open_float, lsp_opts)
-			map("n", "]d", function()
-				vim.diagnostic.jump({ count = 1, float = true })
-			end, { unpack(lsp_opts), desc = "Next diagnostic" })
-			map("n", "[d", function()
-				vim.diagnostic.jump({ count = -1, float = true })
-			end, { unpack(lsp_opts), desc = "Prev diagnostic" })
-			map("n", "<Leader>ih", function()
-				vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({}))
-			end, { unpack(lsp_opts), desc = "Toggle inlay hints" })
-			map({ "n", "v" }, "<Leader>f", function()
-				vim.lsp.buf.format({ timeout_ms = 5000 })
-			end, { unpack(lsp_opts), desc = "LSP Formatter" })
-			map("n", "<Leader>ca", vim.lsp.buf.code_action, lsp_opts)
-			map("n", "ggd", vim.diagnostic.setqflist, { unpack(qf_opts), desc = "Global diagnostics to qf" })
-			map("n", "gdl", vim.diagnostic.setloclist, { unpack(qf_opts), desc = "Buffer diagnostics to qf" })
-		end,
-	})
-
-	au("FileType", {
-		pattern = "qf",
-		callback = function()
-			map("n", "<CR>", "<CR>", { unpack(opts), desc = "Jump to file" })
-		end,
-	})
-end -- }}}
-
-function M.setup()
-	M.colorscheme()
-	M.global_variables()
-	vim.iter(M.disabled_keys):map(function(opt)
-		return map("n", opt, "<Nop>")
-	end)
-	-- M.completion() -- see plugin/completion.lua
-	M.keymaps()
-	M.keymaps_lsp()
-end
-
-return M.setup()
+require("vim._extui").enable({
+	enable = true,
+	msg = {
+		target = "msg",
+	},
+})

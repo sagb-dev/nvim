@@ -1,5 +1,4 @@
----@type vim.lsp.Config
-return {
+vim.lsp.config("lua_ls", {
 	on_init = function(client)
 		if client.workspace_folders then
 			local path = client.workspace_folders[1].name
@@ -10,6 +9,7 @@ return {
 				return
 			end
 		end
+
 		client.config.settings.Lua = vim.tbl_deep_extend("force", client.config.settings.Lua, {
 			runtime = {
 				version = "LuaJIT",
@@ -18,6 +18,7 @@ return {
 					"lua/?/init.lua",
 				},
 			},
+			-- Make the server aware of Neovim runtime files
 			workspace = {
 				checkThirdParty = false,
 				library = {
@@ -27,11 +28,6 @@ return {
 		})
 	end,
 	settings = {
-		Lua = {
-			hint = {
-				enable = true,
-				setType = true,
-			},
-		},
+		Lua = {},
 	},
-}
+})

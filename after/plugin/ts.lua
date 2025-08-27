@@ -1,12 +1,12 @@
 local M = {}
 
-function M.setup()
-	M.packages()
-	M.config()
-end
-
 function M.packages()
 	vim.pack.add({ { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" } })
+end
+
+function M.extras()
+	vim.pack.add({ { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" } })
+	require("treesitter-context").setup()
 end
 
 function M.config()
@@ -47,6 +47,13 @@ function M.config()
 	vim.cmd.packadd("nvim-treesitter")
 end
 
+function M.setup()
+	M.packages()
+	M.config()
+	M.extras()
+end
+
 vim.defer_fn(M.setup, 1000)
+-- M.setup()
 
 return M
