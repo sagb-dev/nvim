@@ -2,6 +2,16 @@ local M = {}
 
 function M.packages()
 	vim.pack.add({ { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" } })
+
+	vim.api.nvim_create_autocmd("PackChanged", {
+		desc = "Update treesitter parsers with every plugin update",
+		callback = function(ev)
+			local spec = ev.data.spec
+			if spec and spec.name == "nvim-treesitter" and ev.data.kind == "update" then
+				vim.schedule(require("nvim-treesitter").update)
+			end
+		end,
+	})
 end
 
 function M.extras()
@@ -28,16 +38,6 @@ function M.config()
 				end
 			end,
 		},
-	})
-
-	vim.api.nvim_create_autocmd("PackChanged", {
-		desc = "Update treesitter parsers with every plugin update",
-		callback = function(ev)
-			local spec = ev.data.spec
-			if spec and spec.name == "nvim-treesitter" and ev.data.kind == "update" then
-				vim.schedule(require("nvim-treesitter").update)
-			end
-		end,
 	})
 
 	-- ts is enabled by default in neovim, but "nvim-treesitter" doesn't

@@ -99,9 +99,9 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
-vim.keymap.set("n", "<leader>ff", function()
-	require("telescope.builtin").find_files()
-end)
+vim.keymap.set("n", "<Leader>ff", function()
+	require("fff").find_files()
+end, { desc = "FFFind files" })
 vim.keymap.set("n", "<leader>fg", function()
 	require("telescope.builtin").live_grep()
 end)

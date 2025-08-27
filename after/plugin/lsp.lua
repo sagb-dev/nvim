@@ -75,7 +75,7 @@ end
 function M.setup()
 	M.packages()
 	M.config()
-	M.status()
+	-- M.status()
 end
 
 vim.defer_fn(M.setup, 100)

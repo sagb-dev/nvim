@@ -177,11 +177,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 	end,
 })
 
-vim.api.nvim_create_autocmd("TextYankPost", {
-	callback = function()
-		vim.highlight.on_yank()
-	end,
-})
+vim.api.nvim_create_autocmd("TextYankPost", { callback = vim.highlight.on_yank })
 
 vim.api.nvim_create_autocmd("BufWritePre", {
 	callback = function()
