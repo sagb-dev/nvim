@@ -32,11 +32,8 @@ vim.api.nvim_create_autocmd("PackChanged", {
 })
 
 vim.pack.add({ { src = "https://github.com/dmtrKovalenko/fff.nvim" } })
-vim.g.fff = {
+require("fff").setup({
 	lazy_sync = true,
-	debug = {
-		enabled = false,
-		show_scores = false,
-	},
-}
-require("fff").setup()
+	max_threads = tonumber(vim.fn.system("nproc")),
+	max_results = 50,
+})

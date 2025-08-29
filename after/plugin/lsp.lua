@@ -51,6 +51,7 @@ function M.config()
 		root_markers = { ".git" },
 	})
 
+	vim.lsp.document_color.enable()
 	vim.lsp.inlay_hint.enable(true)
 	vim.lsp.semantic_tokens.enable()
 	vim.hl.priorities.semantic_tokens = 99 -- I prefer semantic lsp hl instead of ts hl

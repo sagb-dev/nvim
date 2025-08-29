@@ -53,7 +53,7 @@ function M.setup()
 	M.extras()
 end
 
-vim.defer_fn(M.setup, 1000)
--- M.setup()
+-- vim.defer_fn(M.setup, 1000)
+M.setup()
 
 return M
