@@ -46,6 +46,13 @@ function M.config()
 		lazy_sync = true,
 		max_threads = tonumber(vim.fn.system("nproc")),
 		max_results = 50,
+		debug = {
+			enabled = false, -- Set to true to show scores in the UI
+			show_scores = false,
+		},
+		logging = {
+			enabled = false,
+		},
 	})
 end
 

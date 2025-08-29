@@ -20,10 +20,6 @@ function M.builtin()
 	-- <C-x><C-o> omni completion, now defaults to LSP as a source since 0.11
 	-- <C-x><C-u> user defined completion, don't know how its used
 
-	vim.pack.add({
-		{ src = "https://github.com/L3MON4D3/LuaSnip" },
-		{ src = "https://github.com/rafamadriz/friendly-snippets" },
-	})
 	vim.opt.autocomplete = true
 	vim.opt.complete = "o,.,w,b,u"
 	vim.opt.completeopt = { "fuzzy", "preview", "popup", "menuone", "noinsert", "noselect" }
@@ -42,7 +38,34 @@ function M.builtin()
 end
 
 function M.blinkcmp()
-	vim.pack.add({ { src = "https://github.com/Saghen/blink.cmp", version = vim.version.range("^1") } })
+	vim.pack.add({
+		{ src = "https://github.com/Saghen/blink.cmp", version = vim.version.range("^1") },
+		{ src = "https://github.com/L3MON4D3/LuaSnip" },
+		{ src = "https://github.com/rafamadriz/friendly-snippets" },
+	})
+
+	vim.api.nvim_create_autocmd("PackChanged", {
+		callback = function(ev)
+			local spec = ev.data.spec
+			if spec and spec.name == "LuaSnip" and ev.data.kind == "install" or ev.data.kind == "update" then
+				local luasnip_path = vim.fn.stdpath("data") .. "/site/pack/core/opt/fff.nvim"
+				vim.fn.jobstart({ "make", "install_jsregexp" }, {
+					cwd = luasnip_path,
+					on_exit = function(_, code)
+						if code == 0 then
+							vim.notify("LuaSnip make finished successfully in " .. luasnip_path, vim.log.levels.INFO)
+						else
+							vim.notify("LuaSnip make failed with exit code " .. code, vim.log.levels.ERROR)
+						end
+					end,
+				})
+			end
+		end,
+	})
+
+	require("luasnip.loaders.from_vscode").lazy_load()
+	-- require("luasnip.loaders.from_vscode").lazy_load({ paths = { vim.fn.stdpath("config") .. "/snippets" } })
+
 	local blink = require("blink.cmp")
 	blink.setup({
 		fuzzy = { implementation = "prefer_rust_with_warning" },
@@ -64,6 +87,14 @@ function M.blinkcmp()
 		},
 		signature = { enabled = true },
 		completion = {
+			keyword = {
+				range = "full",
+			},
+			trigger = {
+				show_in_snippet = false,
+				show_on_backspace = true,
+				show_on_insert = true,
+			},
 			menu = {
 				-- multiline ghost text when you select a menu item
 				direction_priority = function()
@@ -92,22 +123,23 @@ function M.blinkcmp()
 			},
 		},
 	})
-	-- blink.opts_extend = { "sources.default" }
-	--
-	-- local capabilities = {
-	-- 	textDocument = {
-	-- 		foldingRange = {
-	-- 			dynamicRegistration = false,
-	-- 			lineFoldingOnly = true,
-	-- 		},
-	-- 	},
-	-- }
-	--
-	-- capabilities = blink.get_lsp_capabilities(capabilities)
+
+	blink.opts_extend = { "sources.default" }
+
+	local capabilities = {
+		textDocument = {
+			foldingRange = {
+				dynamicRegistration = false,
+				lineFoldingOnly = true,
+			},
+		},
+	}
+
+	capabilities = blink.get_lsp_capabilities(capabilities)
 end
 
 -- vim.defer_fn(M.setup, 1000)
--- M.setup()
-vim.schedule(M.setup)
+M.setup()
+-- vim.schedule(M.setup)
 
 return M

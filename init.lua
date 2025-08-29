@@ -312,6 +312,7 @@ function M.lsp()
 	local configured_servers = collect_files(lsp_dir)
 	vim.lsp.enable(configured_servers)
 	vim.lsp.enable({
+		"basedpyright",
 		"emmet_language_server",
 		"marksman",
 	})
