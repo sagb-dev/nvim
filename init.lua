@@ -71,11 +71,11 @@ function M.general()
 	vim.opt.list = true
 	vim.opt.mouse = "a"
 	vim.opt.preserveindent = true
-	-- vim.opt.sidescrolloff = 9999
-	-- vim.opt.sidescrolloff = 9999
-	vim.opt.scrolloff = 3
-	vim.opt.sidescrolloff = 3
-	vim.opt.scrolljump = -90 -- scroll like emacs
+	vim.opt.scrolloff = 9999
+	vim.opt.sidescrolloff = 9999
+	-- vim.opt.scrolloff = 3
+	-- vim.opt.sidescrolloff = 3
+	-- vim.opt.scrolljump = -90 -- scroll like emacs
 	vim.opt.sessionoptions = {
 		"blank",
 		"buffers",
@@ -119,7 +119,7 @@ function M.general()
 	vim.opt.number = true
 	vim.opt.relativenumber = true
 	vim.opt.numberwidth = 1
-	vim.opt.foldcolumn = "auto:" .. tostring(6)
+	vim.opt.foldcolumn = "auto:" .. tostring(1)
 	vim.opt.signcolumn = "yes:" .. tostring(1)
 
 	-- vim.opt.foldtext = "v:lua.MinimalFoldText()"
@@ -288,6 +288,25 @@ function M.keymaps()
 
 	map("n", "gvp", "v`[`]")
 
+	map("n", "<Leader>ff", function()
+		require("fff").find_files()
+	end)
+	map("n", "<Leader>fm", function()
+		vim.cmd.Oil()
+	end)
+	map("n", "<leader>fg", function()
+		require("telescope.builtin").live_grep()
+	end)
+	map("n", "<leader>fb", function()
+		require("telescope.builtin").buffers()
+	end)
+	map("n", "<leader>fh", function()
+		require("telescope.builtin").help_tags()
+	end)
+	map("n", "<leader>hQ", function()
+		require("gitsigns").setqflist("all")
+	end)
+
 	vim.api.nvim_create_autocmd("LspAttach", {
 		callback = function(args)
 			local lsp_opts = {
@@ -317,15 +336,15 @@ function M.keymaps()
 			map("n", "gdg", vim.diagnostic.setqflist)
 			map("n", "gdl", vim.diagnostic.setloclist)
 
-			-- map("i", "<C-CR>", function()
-			-- 	if not vim.lsp.inline_completion.get() then
-			-- 		return "<C-CR>"
-			-- 	end
-			-- end, {
-			-- 	expr = true,
-			-- 	replace_keycodes = true,
-			-- 	desc = "Get the current inline completion",
-			-- })
+			map("i", "<C-CR>", function()
+				if not vim.lsp.inline_completion.get() then
+					return "<C-CR>"
+				end
+			end, {
+				expr = true,
+				replace_keycodes = true,
+				desc = "Get the current inline completion",
+			})
 		end,
 	})
 
@@ -335,16 +354,6 @@ function M.keymaps()
 			map("n", "<CR>", "<CR>")
 		end,
 	})
-
-	map("n", "<Leader>ff", require("fff").find_files)
-	map("n", "<Leader>fm", vim.cmd.Oil)
-	map("n", "<leader>fg", require("telescope.builtin").live_grep)
-	map("n", "<leader>fb", require("telescope.builtin").buffers)
-	map("n", "<leader>fh", require("telescope.builtin").help_tags)
-	map("n", "<leader>hQ", function()
-		require("gitsigns").setqflist("all")
-	end)
-
 end
 
 function M.file_managment()

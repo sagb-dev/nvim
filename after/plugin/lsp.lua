@@ -1,11 +1,17 @@
 local M = {}
 
+function M.setup()
+	-- M.status()
+	M.packages()
+	M.config()
+end
+
 function M.packages()
 	vim.pack.add({
-		{ src = "https://github.com/neovim/nvim-lspconfig" },
-		{ src = "https://github.com/nvimtools/none-ls.nvim" },
-		{ src = "https://github.com/gbprod/none-ls-shellcheck.nvim" },
-		{ src = "https://github.com/nvim-lua/plenary.nvim" }, -- none-ls and telescope dependency
+		"https://github.com/neovim/nvim-lspconfig",
+		"https://github.com/nvimtools/none-ls.nvim",
+		"https://github.com/gbprod/none-ls-shellcheck.nvim",
+		"https://github.com/nvim-lua/plenary.nvim", -- none-ls and telescope dependency
 	})
 end
 
@@ -68,18 +74,7 @@ function M.config()
 	})
 end
 
--- This can make `/lsp/init.lua` requirable
--- local config_path = vim.fn.stdpath("config")
--- package.path = package.path .. ";" .. config_path .. "/lsp/init.lua"
--- require("lsp")
-
-function M.setup()
-	M.packages()
-	M.config()
-	-- M.status()
-end
-
-vim.defer_fn(M.setup, 100)
+vim.schedule(M.setup)
 -- M.setup()
 
 return M

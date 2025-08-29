@@ -1,6 +1,3 @@
-local blink = require("blink.cmp")
--- TODO: I need to check if this gets required properly
-
 return {
 	cmd = { "typescript-language-server", "--stdio" },
 	filetypes = {
@@ -33,10 +30,5 @@ return {
 		},
 		javascript = {},
 	},
-	capabilities = vim.tbl_deep_extend(
-		"force",
-		{},
-		vim.lsp.protocol.make_client_capabilities(),
-		blink.get_lsp_capabilities()
-	),
+	capabilities = vim.tbl_deep_extend("force", {}, vim.lsp.protocol.make_client_capabilities()),
 }
