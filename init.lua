@@ -4,6 +4,7 @@ vim.loader.enable()
 vim.g.mapleader = ";" -- vim.keycode('<Space>')
 vim.g.localmapleader = vim.g.mapleader
 local map = vim.keymap.set
+local au = vim.api.nvim_create_autocmd
 
 function M.setup()
 	M.general()
@@ -147,13 +148,13 @@ function M.general()
 	vim.opt.laststatus = 0
 	vim.opt.statusline = "%{repeat('━',winwidth('.'))}"
 
-	vim.api.nvim_create_autocmd({ "InsertLeave", "CmdlineLeave" }, {
+	au({ "InsertLeave", "CmdlineLeave" }, {
 		callback = function()
 			vim.opt.relativenumber = true
 		end,
 	})
 
-	vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
+	au({ "InsertEnter", "CmdlineEnter" }, {
 		callback = function()
 			vim.opt.relativenumber = false
 		end,
@@ -161,7 +162,7 @@ function M.general()
 
 	vim.opt.autowrite = true
 	vim.opt.autowriteall = true
-	vim.api.nvim_create_autocmd("FocusLost", {
+	au("FocusLost", {
 		callback = function()
 			local skip_filetypes = {
 				[""] = true,
@@ -179,7 +180,7 @@ function M.general()
 		end,
 	})
 
-	vim.api.nvim_create_autocmd({ "BufEnter", "BufReadPost" }, {
+	au({ "BufEnter", "BufReadPost" }, {
 		callback = function()
 			local mark = vim.api.nvim_buf_get_mark(0, '"')
 			if mark[1] > 0 and mark[1] <= vim.api.nvim_buf_line_count(0) then
@@ -191,7 +192,7 @@ function M.general()
 		end,
 	})
 
-	vim.api.nvim_create_autocmd("BufWritePre", {
+	au("BufWritePre", {
 		callback = function(event)
 			local dir = vim.fn.fnamemodify(event.match, ":p:h")
 			if vim.fn.isdirectory(dir) == 0 then
@@ -200,13 +201,13 @@ function M.general()
 		end,
 	})
 
-	vim.api.nvim_create_autocmd("TextYankPost", {
+	au("TextYankPost", {
 		callback = function()
 			vim.highlight.on_yank()
 		end,
 	})
 
-	vim.api.nvim_create_autocmd("BufWritePre", {
+	au("BufWritePre", {
 		callback = function()
 			local save_cursor = vim.fn.getpos(".")
 			vim.cmd([[%s/\s\+$//e]])
@@ -214,10 +215,10 @@ function M.general()
 		end,
 	})
 
-	vim.api.nvim_create_autocmd("VimResized", { command = "wincmd =" })
-	vim.api.nvim_create_autocmd("BufWinEnter", { command = "checktime" })
-	vim.api.nvim_create_autocmd({ "BufWinLeave" }, { command = "silent! mkview" })
-	vim.api.nvim_create_autocmd({ "BufWinEnter" }, { command = "silent! loadview" })
+	au("VimResized", { command = "wincmd =" })
+	au("BufWinEnter", { command = "checktime" })
+	au({ "BufWinLeave" }, { command = "silent! mkview" })
+	au({ "BufWinEnter" }, { command = "silent! loadview" })
 
 	require("vim._extui").enable({
 		enable = true,
@@ -307,7 +308,7 @@ function M.keymaps()
 		require("gitsigns").setqflist("all")
 	end)
 
-	vim.api.nvim_create_autocmd("LspAttach", {
+	au("LspAttach", {
 		callback = function(args)
 			local lsp_opts = {
 				buffer = args.buf,
@@ -348,7 +349,7 @@ function M.keymaps()
 		end,
 	})
 
-	vim.api.nvim_create_autocmd("FileType", {
+	au("FileType", {
 		pattern = "qf",
 		callback = function()
 			map("n", "<CR>", "<CR>")
