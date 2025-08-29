@@ -1,5 +1,11 @@
 local M = {}
 
+function M.setup()
+	M.packages()
+	M.config()
+	M.extras()
+end
+
 function M.packages()
 	vim.pack.add({ { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" } })
 
@@ -45,12 +51,6 @@ function M.config()
 	-- :TSInstall or :TSUpdate don't appear at all, so we force the plugin
 	-- to load with the following command
 	vim.cmd.packadd("nvim-treesitter")
-end
-
-function M.setup()
-	M.packages()
-	M.config()
-	M.extras()
 end
 
 -- vim.defer_fn(M.setup, 1000)

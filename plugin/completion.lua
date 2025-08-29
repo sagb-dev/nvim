@@ -1,5 +1,10 @@
 local M = {}
 
+function M.setup()
+	-- M.builtin()
+	M.blinkcmp()
+end
+
 function M.builtin()
 	-- TODO: I still don't get how the builtin completion works in neovim
 	-- https://gpanders.com/blog/whats-new-in-neovim-0-11/#breaking-changes
@@ -87,25 +92,22 @@ function M.blinkcmp()
 			},
 		},
 	})
-	blink.opts_extend = { "sources.default" }
-
-	local capabilities = {
-		textDocument = {
-			foldingRange = {
-				dynamicRegistration = false,
-				lineFoldingOnly = true,
-			},
-		},
-	}
-
-	capabilities = blink.get_lsp_capabilities(capabilities)
+	-- blink.opts_extend = { "sources.default" }
+	--
+	-- local capabilities = {
+	-- 	textDocument = {
+	-- 		foldingRange = {
+	-- 			dynamicRegistration = false,
+	-- 			lineFoldingOnly = true,
+	-- 		},
+	-- 	},
+	-- }
+	--
+	-- capabilities = blink.get_lsp_capabilities(capabilities)
 end
 
-function M.setup()
-	-- M.builtin()
-	M.blinkcmp()
-end
-
-M.setup()
+-- vim.defer_fn(M.setup, 1000)
+-- M.setup()
+vim.schedule(M.setup)
 
 return M

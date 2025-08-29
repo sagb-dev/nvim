@@ -1,5 +1,6 @@
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lsp/lua_ls.lua
 
+---@type vim.lsp.Config
 return {
 	on_init = function(client)
 		if client.workspace_folders then
@@ -45,6 +46,7 @@ return {
 		"selene.yml",
 		"stylua.toml",
 	},
+	workspace_required = true,
 	settings = {
 		Lua = {
 			runtime = {
