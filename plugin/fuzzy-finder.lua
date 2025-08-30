@@ -54,6 +54,8 @@ function M.config()
 			enabled = false,
 		},
 	})
+
+	require("config.keymaps").fuzzy_finder()
 end
 
 M.setup()

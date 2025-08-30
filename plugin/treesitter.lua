@@ -7,8 +7,6 @@ function M.setup()
 end
 
 function M.packages()
-	vim.pack.add({ { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" } })
-
 	vim.api.nvim_create_autocmd("PackChanged", {
 		desc = "Update treesitter parsers with every plugin update",
 		callback = function(ev)
@@ -18,6 +16,11 @@ function M.packages()
 			end
 		end,
 	})
+
+	vim.pack.add({
+		{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
+		{ src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects", version = "main" },
+	})
 end
 
 function M.extras()
@@ -26,6 +29,13 @@ function M.extras()
 end
 
 function M.config()
+	-- ts is enabled by default in neovim, but "nvim-treesitter" doesn't
+	-- really work with any kind of lazy deferred loading, the commands like
+	-- :TSInstall or :TSUpdate don't appear at all, so we force the plugin
+	-- to load with the following command
+	vim.cmd.packadd("nvim-treesitter")
+	vim.cmd.packadd("nvim-treesitter-textobjects")
+
 	require("nvim-treesitter.config").setup({
 		ensure_installed = { "all" },
 		sync_install = true,
@@ -46,11 +56,13 @@ function M.config()
 		},
 	})
 
-	-- ts is enabled by default in neovim, but "nvim-treesitter" doesn't
-	-- really work with any kind of lazy deferred loading, the commands like
-	-- :TSInstall or :TSUpdate don't appear at all, so we force the plugin
-	-- to load with the following command
-	vim.cmd.packadd("nvim-treesitter")
+	require("nvim-treesitter-textobjects").setup({
+		move = {
+			set_jumps = true,
+		},
+	})
+
+	require("config.keymaps").treesitter()
 end
 
 -- vim.defer_fn(M.setup, 1000)

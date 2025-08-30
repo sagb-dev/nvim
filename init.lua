@@ -11,6 +11,7 @@ function M.setup()
 	M.file_manager()
 	vim.schedule(M.diagnostics)
 	vim.schedule(M.lsp)
+	require("config.keymaps").setup()
 end
 
 function M.colorscheme()
