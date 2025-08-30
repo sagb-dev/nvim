@@ -9,6 +9,7 @@ vim.schedule(function()
 		"https://github.com/JoosepAlviste/nvim-ts-context-commentstring",
 		"https://github.com/lewis6991/gitsigns.nvim",
 		"https://github.com/nvim-mini/mini.nvim",
+		"https://github.com/tzachar/local-highlight.nvim",
 	})
 	require("ts_context_commentstring").setup({ enable_autocmd = false })
 	require("Comment").setup({
@@ -26,6 +27,12 @@ vim.schedule(function()
 			virt_text_pos = "right_align",
 		},
 	})
+	require("local-highlight").setup({
+		animate = {
+			enabled = false,
+		},
+	})
+	vim.cmd('LocalHighlightOn')
 end)
 
 -- vim.cmd([[
