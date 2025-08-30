@@ -23,12 +23,6 @@ function M.general()
 		return vim.keymap.set("n", opt, "<Nop>")
 	end)
 
-	vim.keymap.set("n", "j", function()
-		return tonumber(vim.api.nvim_get_vvar("count")) > 0 and "j" or "gj"
-	end, { expr = true, silent = true }) -- Move down, but use 'gj' if no count is given
-	vim.keymap.set("n", "k", function()
-		return tonumber(vim.api.nvim_get_vvar("count")) > 0 and "k" or "gk"
-	end, { expr = true, silent = true }) -- Move up, but use 'gk' if no count is given
 	vim.keymap.set("v", "J", ":m '>+1<cr>gv=gv") -- Move line blacks of any visual selection around
 	vim.keymap.set("v", "K", ":m '<-2<cr>gv=gv")
 	vim.keymap.set("n", "J", "mzJ`z")
@@ -67,10 +61,11 @@ function M.general()
 		end,
 	})
 
-	vim.keymap.set("n", "<leader>fm", vim.cmd.Oil)
 	vim.keymap.set("n", "<leader>hr", function()
 		require("gitsigns").reset_hunk()
 	end)
+
+	vim.keymap.set("n", "-", "<CMD>Oil --float<CR>", { desc = "Open parent directory" })
 end
 
 function M.lsp(args)

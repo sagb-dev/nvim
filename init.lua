@@ -92,11 +92,6 @@ function M.options()
 	vim.o.list = true
 	vim.o.mouse = "a"
 	vim.o.preserveindent = true
-	vim.o.scrolloff = 9999
-	vim.o.sidescrolloff = 9999
-	-- vim.o.scrolloff = 3
-	-- vim.o.sidescrolloff = 3
-	-- vim.o.scrolljump = -90 -- scroll like emacs
 	vim.o.shiftround = true
 	vim.o.showcmd = false
 	vim.o.smartcase = true
@@ -154,17 +149,22 @@ function M.options()
 
 	vim.o.autowrite = true
 	vim.o.autowriteall = true
+	local skip_filetypes = {
+		[""] = true,
+		["*"] = true,
+		help = true,
+		netrw = true,
+		vim = true,
+	}
+
+	local skip_buftypes = {
+		acwrite = true, -- oil.nvim buffer
+		oil = true,
+	}
+
 	vim.api.nvim_create_autocmd("FocusLost", {
 		callback = function()
-			local skip_filetypes = {
-				[""] = true,
-				["*"] = true,
-				help = true,
-				netrw = true,
-				vim = true,
-			}
-
-			if skip_filetypes[vim.bo.filetype] then
+			if skip_buftypes[vim.bo.buftype] or skip_filetypes[vim.bo.filetype] then
 				return
 			end
 
@@ -186,6 +186,9 @@ function M.options()
 
 	vim.api.nvim_create_autocmd("BufWritePre", {
 		callback = function(event)
+			if skip_buftypes[vim.bo.buftype] or skip_filetypes[vim.bo.filetype] then
+				return
+			end
 			local dir = vim.fn.fnamemodify(event.match, ":p:h")
 			if vim.fn.isdirectory(dir) == 0 then
 				vim.fn.mkdir(dir, "p")
@@ -261,7 +264,17 @@ function M.file_manager()
 		"https://github.com/nvim-mini/mini.nvim",
 		"https://github.com/nvim-tree/nvim-web-devicons",
 	})
-	require("oil").setup()
+	require("oil").setup({
+		delete_to_trash = true,
+		watch_for_changes = true,
+		float = {
+			max_height = 20,
+			max_width = 60,
+		},
+		view_options = {
+			show_hidden = true,
+		},
+	})
 end
 
 function M.lsp()
