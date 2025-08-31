@@ -40,7 +40,7 @@ function M.config()
 		ensure_installed = { "all" },
 		sync_install = true,
 		auto_install = true,
-		ignore_install = {},
+		ignore_install = { "nu" },
 		indent = { enable = true },
 		highlight = {
 			enable = true,
