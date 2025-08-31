@@ -9,9 +9,16 @@ function M.setup()
 	M.colorscheme()
 	M.options()
 	M.file_manager()
+
 	vim.schedule(M.diagnostics)
 	vim.schedule(M.lsp)
-	require("config.keymaps").setup()
+
+	vim.api.nvim_create_autocmd("LspAttach", {
+		callback = function(args)
+			require("config.keymaps").lsp(args)
+		end,
+	})
+	require("config.keymaps").general()
 end
 
 function M.colorscheme()
@@ -115,7 +122,7 @@ function M.options()
 	vim.o.ttimeoutlen = 10
 	vim.o.undofile = true
 	vim.o.updatetime = 300
-	vim.o.virtualedit = "block" -- all
+	vim.o.virtualedit = "all" -- all, block
 	-- vim.o.winborder = "rounded"
 
 	vim.o.number = true

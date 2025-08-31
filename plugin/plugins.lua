@@ -27,6 +27,7 @@ vim.schedule(function()
 			virt_text_pos = "right_align",
 		},
 	})
+	require("config.keymaps").git()
 	require("local-highlight").setup({
 		animate = {
 			enabled = false,

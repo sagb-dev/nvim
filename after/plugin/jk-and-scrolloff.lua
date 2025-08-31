@@ -2,11 +2,11 @@ local M = {}
 
 local count = 0
 
--- vim.o.scrolloff = 9999
--- vim.o.sidescrolloff = 9999
-vim.o.scrolloff = 3
-vim.o.sidescrolloff = 3
-vim.o.scrolljump = -90 -- scroll like emacs
+vim.o.scrolloff = 9999
+vim.o.sidescrolloff = 9999
+-- vim.o.scrolloff = 3
+-- vim.o.sidescrolloff = 3
+-- vim.o.scrolljump = -90 -- scroll like emacs
 
 function M.trigger_center()
 	count = count + 1
@@ -35,6 +35,6 @@ function M.setup()
 	})
 end
 
-M.setup()
+-- M.setup()
 
 return M

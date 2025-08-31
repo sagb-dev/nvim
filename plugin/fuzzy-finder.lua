@@ -30,6 +30,7 @@ function M.packages()
 		"https://github.com/nvim-telescope/telescope.nvim",
 		"https://github.com/nvim-lua/plenary.nvim", -- none-ls and telescope dependency
 		"https://github.com/dmtrKovalenko/fff.nvim",
+ 		"https://github.com/folke/snacks.nvim", -- fff dependency
 	})
 end
 
@@ -53,6 +54,10 @@ function M.config()
 		logging = {
 			enabled = false,
 		},
+	})
+
+	require('snacks').setup({
+		image = { }
 	})
 
 	require("config.keymaps").fuzzy_finder()
