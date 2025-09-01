@@ -111,6 +111,7 @@ function M.options()
 	vim.o.splitbelow = true
 	vim.o.splitright = true
 	vim.o.startofline = true
+	vim.o.wrap = false
 
 	-- Default values, ignored in this config because of .editorconfig
 	vim.o.tabstop = 4
@@ -122,8 +123,11 @@ function M.options()
 	vim.o.ttimeoutlen = 10
 	vim.o.undofile = true
 	vim.o.updatetime = 300
-	vim.o.virtualedit = "all" -- all, block
+	vim.o.virtualedit = "block" -- all, block
 	-- vim.o.winborder = "rounded"
+	vim.o.scrolloff = 9999
+	vim.o.sidescrolloff = 9999
+	vim.o.scrolljump = -90 -- scroll like emacs
 
 	vim.o.number = true
 	vim.o.relativenumber = true
@@ -167,6 +171,7 @@ function M.options()
 	local skip_buftypes = {
 		acwrite = true, -- oil.nvim buffer
 		oil = true,
+		nofile = true,
 	}
 
 	vim.api.nvim_create_autocmd("FocusLost", {
@@ -174,12 +179,11 @@ function M.options()
 			if skip_buftypes[vim.bo.buftype] or skip_filetypes[vim.bo.filetype] then
 				return
 			end
-
-			vim.cmd.write()
+			vim.cmd.write("++p") -- ++p is like doing `mkdir -p`
 		end,
 	})
 
-	vim.api.nvim_create_autocmd({ "BufEnter", "BufReadPost" }, {
+	vim.api.nvim_create_autocmd("BufEnter", {
 		callback = function()
 			local mark = vim.api.nvim_buf_get_mark(0, '"')
 			if mark[1] > 0 and mark[1] <= vim.api.nvim_buf_line_count(0) then
@@ -205,7 +209,13 @@ function M.options()
 
 	vim.api.nvim_create_autocmd("TextYankPost", {
 		callback = function()
-			vim.highlight.on_yank()
+			local extracted_bg = vim.api.nvim_get_hl(0, { name = "ColorColumn" }).bg
+			vim.api.nvim_set_hl(0, "TextYankPost", { bg = extracted_bg })
+
+			vim.hl.on_yank({
+				timeout = 500,
+				higroup = "TextYankPost",
+			})
 		end,
 	})
 
@@ -338,6 +348,7 @@ function M.lsp()
 		"jdtls",
 		"marksman",
 		"nushell",
+		"ocamllsp",
 		"rust_analyzer",
 		"svelte",
 		"zls",

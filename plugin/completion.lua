@@ -48,7 +48,7 @@ function M.blinkcmp()
 		callback = function(ev)
 			local spec = ev.data.spec
 			if spec and spec.name == "LuaSnip" and ev.data.kind == "install" or ev.data.kind == "update" then
-				local luasnip_path = vim.fn.stdpath("data") .. "/site/pack/core/opt/fff.nvim"
+				local luasnip_path = vim.fn.stdpath("data") .. "/site/pack/core/opt/LuaSnip"
 				vim.fn.jobstart({ "make", "install_jsregexp" }, {
 					cwd = luasnip_path,
 					on_exit = function(_, code)

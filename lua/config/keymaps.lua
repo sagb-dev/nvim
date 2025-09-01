@@ -1,5 +1,4 @@
 local M = {}
--- stylua: ignore start
 
 function M.general()
 	M.disable = {
@@ -19,49 +18,47 @@ function M.general()
 
 	vim.keymap.set("v", "J", ":m '>+1<cr>gv=gv") -- Move line blacks of any visual selection around
 	vim.keymap.set("v", "K", ":m '<-2<cr>gv=gv")
-	vim.keymap.set("n", "J", "mzJ`z")
 	vim.keymap.set("v", ">", ">gv") -- Keep the visual selection after using < or > motions
 	vim.keymap.set("v", "<", "<gv")
-	vim.keymap.set("n", "//", "/<Up>") -- Go to last searched term
-	vim.keymap.set("n", "<Tab>", vim.cmd.bnext)
-	vim.keymap.set("n", "<S-Tab>", vim.cmd.bprevious)
+	vim.keymap.set("n", "gvp", "v`[`]", { desc = "Similar to builtin command `gv` but for pasted text" })
+
+	vim.keymap.set("n", "//", "/<up>") -- Go to last searched term
+	vim.keymap.set("n", "<tab>", vim.cmd.bnext)
+	vim.keymap.set("n", "<s-tab>", vim.cmd.bprevious)
 	vim.keymap.set("n", "d<Tab>", vim.cmd.bdelete)
-	vim.keymap.set("n", "<leader>w", function() vim.opt.wrap = not vim.o.wrap end)
+	vim.keymap.set("n", "<leader>w", function()
+		vim.opt.wrap = not vim.o.wrap
+	end)
 	vim.keymap.set("n", "n", "nzzzv")
 	vim.keymap.set("n", "N", "Nzzzv")
-	vim.keymap.set("n", "#", "*N") -- Simplify search, tbh it doesn't make much sense to search up or down for me
-	vim.keymap.set("n", "*", "*N")
+	vim.keymap.set("n", "<leader>cd", function()
+		vim.fn.chdir(vim.fn.expand("%:p:h"))
+	end, { desc = "Change parent directory of current buffer file" })
+
 	vim.keymap.set("i", ",", ",<C-g>u") -- add break-points to undolist
 	vim.keymap.set("i", ".", ".<C-g>u")
 	vim.keymap.set("i", "!", "!<C-g>u")
 	vim.keymap.set("i", "?", "?<C-g>u")
-	vim.keymap.set("n", "<leader>cd", function() vim.fn.chdir(vim.fn.expand("%:p:h")) end)
-	vim.keymap.set({ "n", "x", "o" }, "gy", '"+y') -- in case you use unnamedplus, to use the system clipboard
-	vim.keymap.set({ "n", "x", "o" }, "gp", '"+p')
-	vim.keymap.set({ "n", "x", "o" }, "<C-l>", function()
-		vim.opt.hlsearch = not vim.o.hlsearch and true
-	end)
 
-	vim.keymap.set("n", "gvp", "v`[`]")
+	vim.keymap.set("n", "-", "<CMD>Oil --float<CR>", { desc = "Open parent directory" })
 
+	vim.keymap.set("n", "<leader>qQ", vim.cmd.cclose)
 	vim.api.nvim_create_autocmd("FileType", {
 		pattern = "qf",
 		callback = function()
 			vim.keymap.set("n", "<CR>", "<CR>")
 		end,
 	})
-
-	vim.keymap.set("n", "-", "<CMD>Oil --float<CR>", { desc = "Open parent directory" })
 end
 
 function M.git()
 	vim.keymap.set("n", "<leader>hQ", function()
 		require("gitsigns").setqflist("all")
 	end)
-
-	vim.keymap.set("n", "<leader>hr", function()
-		require("gitsigns").reset_hunk()
-	end)
+	vim.keymap.set("n", "<leader>hr", require("gitsigns").reset_hunk)
+	vim.keymap.set("n", "<leader>hP", require("gitsigns").preview_hunk)
+	vim.keymap.set("n", "<leader>hn", require("gitsigns").next_hunk)
+	vim.keymap.set("n", "<leader>hp", require("gitsigns").prev_hunk)
 end
 
 function M.lsp(args)
@@ -119,53 +116,90 @@ function M.treesitter()
 	local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
 
 	-- Text objects: select
-	-- keymaps
+	-- keymaps(text objects, they only exist in operator-pending or v-mode)
 	-- You can use the capture groups defined in `textobjects.scm`
-	vim.keymap.set({ "x", "o" }, "af", function() select.select_textobject("@function.outer", "textobjects") end)
-	vim.keymap.set({ "x", "o" }, "if", function() select.select_textobject("@function.inner", "textobjects") end)
-	vim.keymap.set({ "x", "o" }, "ac", function() select.select_textobject("@class.outer", "textobjects") end)
-	vim.keymap.set({ "x", "o" }, "ic", function() select.select_textobject("@class.inner", "textobjects") end)
+	vim.keymap.set({ "x", "o" }, "af", function()
+		select.select_textobject("@function.outer", "textobjects")
+	end)
+	vim.keymap.set({ "x", "o" }, "if", function()
+		select.select_textobject("@function.inner", "textobjects")
+	end)
+	vim.keymap.set({ "x", "o" }, "ac", function()
+		select.select_textobject("@class.outer", "textobjects")
+	end)
+	vim.keymap.set({ "x", "o" }, "ic", function()
+		select.select_textobject("@class.inner", "textobjects")
+	end)
 	-- You can also use captures from other query groups like `locals.scm`
-	vim.keymap.set({ "x", "o" }, "as", function() select.select_textobject("@local.scope", "locals") end)
+	vim.keymap.set({ "x", "o" }, "as", function()
+		select.select_textobject("@local.scope", "locals")
+	end)
 
 	-- Text objects: swap
-	-- keymaps
-	vim.keymap.set("n", "<leader>a", function() swap.swap_next("@parameter.inner") end)
-	vim.keymap.set("n", "<leader>A", function() swap.swap_previous("@parameter.outer") end)
+	-- keymaps(operator-commands, they don't accept a motion)
+	vim.keymap.set("n", "]a", function()
+		swap.swap_next("@parameter.inner")
+	end)
+	vim.keymap.set("n", "[a", function()
+		swap.swap_previous("@parameter.outer")
+	end)
 
 	-- Text objects: move
-	-- keymaps
+	-- keymaps(motions)
 	-- You can use the capture groups defined in `textobjects.scm`
-	vim.keymap.set({ "n", "x", "o" }, "]m", function() move.goto_next_start("@function.outer", "textobjects") end)
-	vim.keymap.set({ "n", "x", "o" }, "]]", function() move.goto_next_start("@class.outer", "textobjects") end)
-	-- You can also pass a list to group multiple queries.
-	vim.keymap.set({ "n", "x", "o" }, "]o", function() move.goto_next_start({ "@loop.inner", "@loop.outer" }, "textobjects") end)
+	vim.keymap.set({ "n", "x", "o" }, "]af", function()
+		move.goto_next_start("@function.outer", "textobjects")
+	end)
+	vim.keymap.set({ "n", "x", "o" }, "]ac", function()
+		move.goto_next_start("@class.outer", "textobjects")
+	end)
+	-- -- You can also pass a list to group multiple queries.
+	-- vim.keymap.set({ "n", "x", "o" }, "]o",
+	-- 	function()
+	-- 		move.goto_next_start({ "@loop.inner", "@loop.outer" }, "textobjects")
+	-- 	end)
 	-- You can also use captures from other query groups like `locals.scm` or `folds.scm`
-	vim.keymap.set({ "n", "x", "o" }, "]s", function() move.goto_next_start("@local.scope", "locals") end)
-	vim.keymap.set({ "n", "x", "o" }, "]z", function() move.goto_next_start("@fold", "folds") end)
+	vim.keymap.set({ "n", "x", "o" }, "]s", function()
+		move.goto_next_start("@local.scope", "locals")
+	end)
+	vim.keymap.set({ "n", "x", "o" }, "]z", function()
+		move.goto_next_start("@fold", "folds")
+	end)
 
-	vim.keymap.set({ "n", "x", "o" }, "]M", function() move.goto_next_end("@function.outer", "textobjects") end)
-	vim.keymap.set({ "n", "x", "o" }, "][", function() move.goto_next_end("@class.outer", "textobjects") end)
+	vim.keymap.set({ "n", "x", "o" }, "]M", function()
+		move.goto_next_end("@function.outer", "textobjects")
+	end)
+	vim.keymap.set({ "n", "x", "o" }, "][", function()
+		move.goto_next_end("@class.outer", "textobjects")
+	end)
 
-	vim.keymap.set({ "n", "x", "o" }, "[m", function() move.goto_previous_start("@function.outer", "textobjects") end)
-	vim.keymap.set({ "n", "x", "o" }, "[[", function() move.goto_previous_start("@class.outer", "textobjects") end)
+	vim.keymap.set({ "n", "x", "o" }, "[m", function()
+		move.goto_previous_start("@function.outer", "textobjects")
+	end)
+	vim.keymap.set({ "n", "x", "o" }, "[[", function()
+		move.goto_previous_start("@class.outer", "textobjects")
+	end)
 
-	vim.keymap.set({ "n", "x", "o" }, "[M", function() move.goto_previous_end("@function.outer", "textobjects") end)
-	vim.keymap.set({ "n", "x", "o" }, "[]", function() move.goto_previous_end("@class.outer", "textobjects") end)
+	vim.keymap.set({ "n", "x", "o" }, "[M", function()
+		move.goto_previous_end("@function.outer", "textobjects")
+	end)
+	vim.keymap.set({ "n", "x", "o" }, "[]", function()
+		move.goto_previous_end("@class.outer", "textobjects")
+	end)
 
 	-- Go to either the start or the end, whichever is closer.
 	-- Use if you want more granular movements
-	vim.keymap.set({ "n", "x", "o" }, "]d", function() move.goto_next("@conditional.outer", "textobjects") end)
-	vim.keymap.set({ "n", "x", "o" }, "[d", function() move.goto_previous("@conditional.outer", "textobjects") end)
+	vim.keymap.set({ "n", "x", "o" }, "]d", function()
+		move.goto_next("@conditional.outer", "textobjects")
+	end)
+	vim.keymap.set({ "n", "x", "o" }, "[d", function()
+		move.goto_previous("@conditional.outer", "textobjects")
+	end)
 
 	-- Repeat movement with ; and ,
 	-- ensure ; goes forward and , goes backward regardless of the last direction
 	vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move_next)
 	vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_previous)
-
-	-- vim way: ; goes to the direction you were moving.
-	-- vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
-	-- vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
 
 	-- Optionally, make builtin f, F, t, T also repeatable with ; and ,
 	vim.keymap.set({ "n", "x", "o" }, "f", ts_repeat_move.builtin_f_expr, { expr = true })
@@ -174,5 +208,4 @@ function M.treesitter()
 	vim.keymap.set({ "n", "x", "o" }, "T", ts_repeat_move.builtin_T_expr, { expr = true })
 end
 
--- stylua: ignore end
 return M

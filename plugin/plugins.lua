@@ -1,8 +1,3 @@
--- vim.pack.add({ "https://github.com/chrisgrieser/nvim-origami" })
--- vim.opt.foldlevel = 99
--- vim.opt.foldlevelstart = 99
--- require("origami").setup()
-
 vim.schedule(function()
 	vim.pack.add({
 		"https://github.com/numToStr/Comment.nvim",
