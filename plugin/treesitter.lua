@@ -3,7 +3,6 @@ local M = {}
 function M.setup()
 	M.packages()
 	M.config()
-	M.extras()
 end
 
 function M.packages()
@@ -18,14 +17,16 @@ function M.packages()
 	})
 
 	vim.pack.add({
-		{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
-		{ src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects", version = "main" },
+		{
+			src = "https://github.com/nvim-treesitter/nvim-treesitter",
+			version = "main",
+		},
+		{
+			src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
+			version = "main",
+		},
+		{ src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
 	})
-end
-
-function M.extras()
-	vim.pack.add({ { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" } })
-	require("treesitter-context").setup()
 end
 
 function M.config()
@@ -34,8 +35,6 @@ function M.config()
 	-- :TSInstall or :TSUpdate don't appear at all, so we force the plugin
 	-- to load with the following command
 	vim.cmd.packadd("nvim-treesitter")
-	vim.cmd.packadd("nvim-treesitter-textobjects")
-
 	require("nvim-treesitter.config").setup({
 		ensure_installed = { "all" },
 		sync_install = true,
@@ -48,24 +47,39 @@ function M.config()
 			-- disable ts in big files
 			disable = function(_, buf) -- _ is lang
 				local max_filesize = 100 * 1024 -- 100 KB
-				local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-				if ok and stats and stats.size > max_filesize then
+				local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
+				if
+					ok
+					and stats
+					and stats --[[@cast -?]].size > max_filesize
+				then
 					return true
 				end
 			end,
 		},
+
+		select = {
+			include_surrounding_whitespace = true,
+		},
 	})
 
+	vim.api.nvim_create_autocmd("FileType", {
+		pattern = "*",
+		callback = function()
+			vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+		end,
+	})
+
+	require("treesitter-context").setup()
+
+	---@diagnostic disable-next-line: param-type-not-match
 	require("nvim-treesitter-textobjects").setup({
 		move = {
 			set_jumps = true,
 		},
 	})
-
-	require("config.keymaps").treesitter()
 end
 
--- vim.defer_fn(M.setup, 1000)
 M.setup()
 
 return M

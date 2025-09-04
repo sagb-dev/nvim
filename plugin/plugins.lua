@@ -1,10 +1,17 @@
+local gh = "https://github.com/"
+
+vim.pack.add({ { src = gh .. "chrisgrieser/nvim-origami" } })
+require("origami").setup()
+vim.o.foldlevelstart = 1
+
 vim.schedule(function()
 	vim.pack.add({
-		"https://github.com/numToStr/Comment.nvim",
-		"https://github.com/JoosepAlviste/nvim-ts-context-commentstring",
-		"https://github.com/lewis6991/gitsigns.nvim",
-		"https://github.com/nvim-mini/mini.nvim",
-		"https://github.com/tzachar/local-highlight.nvim",
+		{ src = gh .. "numToStr/Comment.nvim" },
+		{ src = gh .. "lewis6991/gitsigns.nvim" },
+		{ src = gh .. "nvim-mini/mini.nvim" },
+		{ src = gh .. "tzachar/local-highlight.nvim" },
+		{ src = gh .. "ThePrimeagen/refactoring.nvim" },
+		{ src = gh .. "JoosepAlviste/nvim-ts-context-commentstring" },
 	})
 	require("ts_context_commentstring").setup({ enable_autocmd = false })
 	require("Comment").setup({
@@ -22,13 +29,13 @@ vim.schedule(function()
 			virt_text_pos = "right_align",
 		},
 	})
-	require("config.keymaps").git()
 	require("local-highlight").setup({
 		animate = {
 			enabled = false,
 		},
 	})
 	vim.cmd("LocalHighlightOn")
+	require("refactoring").setup()
 end)
 
 -- vim.cmd([[

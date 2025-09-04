@@ -9,16 +9,7 @@ function M.setup()
 	M.colorscheme()
 	M.options()
 	M.file_manager()
-
-	vim.schedule(M.diagnostics)
-	vim.schedule(M.lsp)
-
-	vim.api.nvim_create_autocmd("LspAttach", {
-		callback = function(args)
-			require("config.keymaps").lsp(args)
-		end,
-	})
-	require("config.keymaps").general()
+	M.diagnostics()
 end
 
 function M.colorscheme()
@@ -77,8 +68,8 @@ function M.options()
 		"winpos",
 		"winsize",
 	}
-	-- if you make use of `n` in cpsetions and virtual_lines you'll have to modify
-	-- the format of the diagnostics displayed by virtual_lines
+	-- if you make use of `n` in cpsetions and virtual_lines you'll have to
+	-- modify the format of the diagnostics displayed by virtual_lines
 	-- vim.o.cpoptions:append("n")
 	vim.o.showbreak = "↪ "
 	vim.o.breakindent = true
@@ -132,8 +123,8 @@ function M.options()
 	vim.o.number = true
 	vim.o.relativenumber = true
 	vim.o.numberwidth = 1
-	vim.o.foldcolumn = "auto:" .. tostring(1)
-	vim.o.signcolumn = "yes:" .. tostring(1)
+	vim.o.foldcolumn = "auto:1"
+	-- vim.o.signcolumn = "yes:1"
 
 	vim.o.swapfile = false
 	vim.o.backup = true
@@ -170,12 +161,14 @@ function M.options()
 
 	local skip_buftypes = {
 		acwrite = true, -- oil.nvim buffer
+		nofile = true, --- fff.nvim buffer
 		oil = true,
-		nofile = true,
+		prompt = true, --- fff.nvim buffer
 	}
 
 	vim.api.nvim_create_autocmd("FocusLost", {
 		callback = function()
+			---@diagnostic disable-next-line: unnecessary-if
 			if skip_buftypes[vim.bo.buftype] or skip_filetypes[vim.bo.filetype] then
 				return
 			end
@@ -197,6 +190,7 @@ function M.options()
 
 	vim.api.nvim_create_autocmd("BufWritePre", {
 		callback = function(event)
+			---@diagnostic disable-next-line: unnecessary-if
 			if skip_buftypes[vim.bo.buftype] or skip_filetypes[vim.bo.filetype] then
 				return
 			end
@@ -253,7 +247,7 @@ function M.diagnostics()
 		-- virtual_lines = {
 		-- 	current_line = true,
 		-- },
-		virtual_text = true,
+		-- virtual_text = true,
 		signs = {
 			text = {
 				[vim.diagnostic.severity.ERROR] = " ",
@@ -290,77 +284,6 @@ function M.file_manager()
 		},
 		view_options = {
 			show_hidden = true,
-		},
-	})
-end
-
-function M.lsp()
-	vim.pack.add({
-		"https://github.com/neovim/nvim-lspconfig",
-		"https://github.com/nvimtools/none-ls.nvim",
-		"https://github.com/gbprod/none-ls-shellcheck.nvim",
-		"https://github.com/nvim-lua/plenary.nvim", -- none-ls and telescope dependency
-	})
-
-	vim.api.nvim_create_autocmd("LspProgress", {
-		group = vim.api.nvim_create_augroup("lsp.progress", { clear = true }),
-		callback = function()
-			print(vim.lsp.status())
-		end,
-	})
-
-	vim.lsp.config("*", {
-		capabilities = {
-			textDocument = {
-				semanticTokens = {
-					multilineTokenSupport = true,
-				},
-			},
-		},
-		root_markers = { ".git" },
-	})
-
-	vim.lsp.document_color.enable()
-	vim.lsp.inlay_hint.enable(true)
-	vim.lsp.semantic_tokens.enable()
-	vim.hl.priorities.semantic_tokens = 99 -- I prefer semantic lsp hl instead of ts hl
-	vim.lsp.inline_completion.enable(true)
-
-	local function collect_files(dir_path)
-		local tbl = {}
-		local files = vim.fn.glob(dir_path .. "/*.lua", false, true)
-		vim.iter(files):map(function(file)
-			local filename = vim.fn.fnamemodify(file, ":t:r")
-			if filename == "init" then
-				return
-			end
-			return table.insert(tbl, filename)
-		end)
-		return tbl
-	end
-
-	local lsp_dir = vim.fn.stdpath("config") .. "/lsp"
-	local configured_servers = collect_files(lsp_dir)
-	vim.lsp.enable(configured_servers)
-	vim.lsp.enable({
-		"basedpyright",
-		"emmet_language_server",
-		"jdtls",
-		"marksman",
-		"nushell",
-		"ocamllsp",
-		"rust_analyzer",
-		"svelte",
-		"zls",
-	})
-
-	local null_ls = require("null-ls")
-	null_ls.setup({
-		sources = {
-			null_ls.builtins.formatting.stylua,
-			null_ls.builtins.code_actions.gitsigns,
-			require("none-ls-shellcheck.diagnostics"),
-			require("none-ls-shellcheck.code_actions"),
 		},
 	})
 end

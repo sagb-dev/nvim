@@ -1,0 +1,35 @@
+{
+  "runtime": {
+    "version": "LuaJIT",
+    "requirePattern": [
+      "lua/?.lua",
+      "lua/?/init.lua",
+      "?/lua/?.lua",
+      "?/lua/?/init.lua"
+    ],
+    "path": [
+      "lua/?.lua",
+      "lua/?/init.lua"
+    ]
+  },
+  "diagnostics": {
+    "disable": [
+      "missing-parameters",
+      "missing-fields"
+    ]
+  },
+  "workspace": {
+    "checkThirdParty": false,
+    "library": [
+      "$VIMRUNTIME",
+      "$LLS_Addons/luvit/",
+      "$XDG_DATA_HOME/nvim/site/pack/core/opt/"
+    ],
+    "ignoreGlobs": [
+      "**/*_spec.lua"
+    ]
+  },
+  "hint": {
+    "enable": true
+  }
+}

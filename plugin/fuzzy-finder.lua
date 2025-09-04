@@ -34,6 +34,7 @@ function M.packages()
 end
 
 function M.config()
+	vim.cmd.packadd("telescope.nvim")
 	require("telescope").setup({
 		pickers = {
 			find_files = {
@@ -42,7 +43,8 @@ function M.config()
 		},
 	})
 
-	require("fff").setup({
+	vim.g.fff = {
+		prompt = " ",
 		lazy_sync = true,
 		max_threads = tonumber(vim.fn.system("nproc")),
 		max_results = 50,
@@ -53,11 +55,9 @@ function M.config()
 		logging = {
 			enabled = false,
 		},
-	})
-
-	require("config.keymaps").fuzzy_finder()
+	}
 end
 
-M.setup()
+vim.schedule(M.setup)
 
 return M
