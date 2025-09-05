@@ -10,38 +10,44 @@ local disable = {
 	"<right>",
 	"<backspace>",
 	"<enter>",
-	"<cr>",
 }
 
 vim.iter(disable):map(function(opt)
 	return map("n", opt, "<Nop>")
 end)
 
-map("n", "gcy", "yygccp", { remap = true, desc = "yank line, comment out and paste below" })
-map("v", "gcy", "ygvgc`>p", { remap = true, desc = "yank block, comment out and paste below" })
-map("n", "gs", "`[v`]", { desc = "goto last selection, this is yanked, changed or pasted text" })
-map("v", "J", ":m '>+1<CR>gv=gv", { desc = "move selected block up or down" })
-map("v", "K", ":m '<-2<CR>gv=gv", { desc = "move selected block up or down" })
-map("v", ">", ">gv", { desc = "Keep the visual selection after shifting it" })
-map("v", "<", "<gv", { desc = "Keep the visual selection after shifting it" })
-map("n", "//", "/<up>", { desc = "Go to last searched term" })
-map("n", "<esc>", "<cmd>nohlsearch<cr>", { desc = "turn off highlighted search term" })
-map("n", "<leader>w", ":set wrap!<cr>")
-map("n", "<leader>cd", function()
-	vim.fn.chdir(vim.fn.expand("%:p:h"))
-	require("fff").change_indexing_directory(vim.fn.getcwd())
-end, { desc = "Change parent directory of current buffer file" })
+map("n", "<cr>", "i<cr><esc>", { silent = true })
 
-map("n", "<a-q>", vim.cmd.cclose, { desc = "close quickfix list" })
+map("n", "gcy", "yygccp", { remap = true, silent = true, desc = "yank line, comment out and paste below" })
+map("v", "gcy", "ygvgc`>p", { remap = true, silent = true, desc = "yank block, comment out and paste below" })
+map("n", "gs", "`[v`]", { silent = true, desc = "goto last selection, this is yanked, changed or pasted text" })
+
+map("n", "<a-j>", ":m .+1<CR>==", { silent = true, desc = "move selected line up or down" })
+map("n", "<a-k>", ":m .-2<CR>==", { silent = true, desc = "move selected line up or down" })
+map({ "x", "v" }, "<a-j>", ":m '>+1<CR>gv=gv", { silent = true, desc = "move selected block up or down" })
+map({ "x", "v" }, "<a-k>", ":m '<-2<CR>gv=gv", { silent = true, desc = "move selected block up or down" })
+
+map("v", ">", ">gv", { silent = true, desc = "keep the visual selection after shifting it" })
+map("v", "<", "<gv", { silent = true, desc = "keep the visual selection after shifting it" })
+
+map("n", "//", "/<up>", { desc = "go to last searched term" })
+map("n", "<esc>", function()
+	vim.snippet.stop()
+	vim.cmd.nohlsearch()
+end, { silent = true, desc = "turn off highlighted search term, and stop snippet input" })
+map("n", "<leader>w", ":set wrap!<cr>", { silent = true, desc = "toggle wrap" })
+
+map("n", "<leader>cc", vim.cmd.cclose, { silent = true, desc = "close quickfix list" })
 au("FileType", {
 	pattern = "qf",
 	callback = function()
-		map("n", "<a-j>", "<cmd>cnext<cr>", { desc = "navigate quickfix list" })
-		map("n", "<a-k>", "<cmd>cprev<cr>", { desc = "navigate quickfix list" })
+		map("n", "<c-j>", "<cmd>cnext<cr>", { silent = true, desc = "navigate quickfix list" })
+		map("n", "<c-k>", "<cmd>cprev<cr>", { silent = true, desc = "navigate quickfix list" })
+		-- vim.cmd.wincmd('L') -- In case you want the quickfix list to open to the right all the time
 	end,
 })
 
-map("n", "<c-q>h", function()
+map("n", "<leader>ch", function()
 	require("gitsigns").setqflist("all")
 end)
 
@@ -70,13 +76,20 @@ map("n", "<leader>fh", function()
 end, { desc = "Telescope help tags" })
 
 map("n", "gl", vim.diagnostic.open_float, { desc = "open current line diagnostics in a floating window" })
-map("n", "<c-q>d", vim.diagnostic.setqflist, { desc = "populate quickfix with diagnostics" })
-map("n", "<c-q>dl", vim.diagnostic.setloclist, { desc = "populate quickfix with local diagnostics" })
+map("n", "]d", vim.diagnostic.open_float, { desc = "open current line diagnostics in a floating window" })
+map("n", "]d", function()
+	vim.diagnostic.jump({ count = 1 })
+end, { desc = "goto next diagnostic" })
+map("n", "[d", function()
+	vim.diagnostic.jump({ count = -1 })
+end, { desc = "goto previous diagnostic" })
+map("n", "<leader>cd", vim.diagnostic.setqflist, { desc = "populate quickfix with diagnostics" })
+map("n", "<leader>cdl", vim.diagnostic.setloclist, { desc = "populate quickfix with local diagnostics" })
 
-cmd("EnableLsp", function()
-	require("config.lsp").setup()
-	vim.cmd.LspStart()
-end, { desc = "configure and start the LSP manually" })
+cmd("ChangeDirectory", function()
+	vim.fn.chdir(vim.fn.expand("%:p:h"))
+	require("fff").change_indexing_directory(vim.fn.getcwd())
+end, { desc = "change directory to be current buffer parent directory" })
 
 au("LspAttach", {
 	callback = function(args)

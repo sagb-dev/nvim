@@ -1,5 +1,23 @@
 local M = {}
 
+function M.enable_servers()
+	vim.cmd.packadd("nvim-lspconfig")
+	vim.lsp.enable({
+		"basedpyright", -- python
+		"emmet_language_server", -- js, react, etc
+		"emmylua_ls",
+		"jdtls", -- java
+		"marksman", -- markdown
+		"nushell", -- nushell
+		"ocamllsp", -- ocaml
+		"ruff", -- python
+		"rust_analyzer", -- rust
+		"svelte", -- svelte
+		"zls", -- zig
+		-- "lua_ls",
+	})
+end
+
 function M.setup()
 	vim.pack.add({
 		"https://github.com/neovim/nvim-lspconfig",
@@ -20,21 +38,6 @@ function M.setup()
 	vim.hl.priorities.semantic_tokens = 99 -- I prefer semantic lsp hl instead of ts hl
 	vim.lsp.inline_completion.enable(true)
 
-	vim.lsp.enable({
-		"basedpyright", -- python
-		"emmet_language_server", -- js, react, etc
-		"emmylua_ls",
-		"jdtls", -- java
-		"marksman", -- markdown
-		"nushell", -- nushell
-		"ocamllsp", -- ocaml
-		"ruff", -- python
-		"rust_analyzer", -- rust
-		"svelte", -- svelte
-		"zls", -- zig
-		-- "lua_ls",
-	})
-
 	local null_ls = require("null-ls")
 	null_ls.setup({
 		sources = {
@@ -45,5 +48,9 @@ function M.setup()
 		},
 	})
 end
+
+vim.api.nvim_create_user_command("LspEnable", M.enable_servers, { desc = "configure and start the LSP manually" })
+
+M.setup()
 
 return M
