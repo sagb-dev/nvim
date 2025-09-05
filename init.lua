@@ -255,7 +255,6 @@ vim.pack.add({
 	"https://github.com/nvim-mini/mini.nvim",
 	"https://github.com/nvim-tree/nvim-web-devicons",
 	"https://github.com/miikanissi/modus-themes.nvim",
-	"https://github.com/folke/tokyonight.nvim",
 })
 
 require("oil").setup({
