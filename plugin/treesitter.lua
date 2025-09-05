@@ -73,11 +73,7 @@ function M.config()
 	require("treesitter-context").setup()
 
 	---@diagnostic disable-next-line: param-type-not-match
-	require("nvim-treesitter-textobjects").setup({
-		move = {
-			set_jumps = true,
-		},
-	})
+	require("nvim-treesitter-textobjects").setup()
 end
 
 M.setup()

@@ -106,36 +106,36 @@ au("LspAttach", {
 -- keymaps
 -- You can use the capture groups defined in `textobjects.scm`
 map({ "x", "o" }, "af", function()
-	require("nvim-treesitter-textobjects.select").select_textobject("@function.outer", "textobjects")
+	return require("nvim-treesitter-textobjects.select").select_textobject("@function.outer")
 end)
 map({ "x", "o" }, "if", function()
-	require("nvim-treesitter-textobjects.select").select_textobject("@function.inner", "textobjects")
+	return require("nvim-treesitter-textobjects.select").select_textobject("@function.inner")
 end)
 map({ "x", "o" }, "ac", function()
-	require("nvim-treesitter-textobjects.select").select_textobject("@class.outer", "textobjects")
+	return require("nvim-treesitter-textobjects.select").select_textobject("@class.outer")
 end)
 map({ "x", "o" }, "ic", function()
-	require("nvim-treesitter-textobjects.select").select_textobject("@class.inner", "textobjects")
+	return require("nvim-treesitter-textobjects.select").select_textobject("@class.inner")
 end)
 -- You can also use captures from other query groups like `locals.scm`
 map({ "x", "o" }, "as", function()
-	require("nvim-treesitter-textobjects.select").select_textobject("@local.scope", "locals")
+	return require("nvim-treesitter-textobjects.select").select_textobject("@local.scope", "locals")
 end)
 
 map("n", "<leader>a", function()
-	require("nvim-treesitter-textobjects.swap").swap_next("@parameter.inner")
+	return require("nvim-treesitter-textobjects.swap").swap_next("@parameter.inner")
 end)
 map("n", "<leader>A", function()
-	require("nvim-treesitter-textobjects.swap").swap_previous("@parameter.outer")
+	return require("nvim-treesitter-textobjects.swap").swap_previous("@parameter.outer")
 end)
 
 -- Repeat movement with ; and ,
 -- ensure ; goes forward and , goes backward regardless of the last direction
 map({ "n", "x", "o" }, ";", function()
-	require("nvim-treesitter-textobjects.repeatable_move").repeat_last_move_next()
+	return require("nvim-treesitter-textobjects.repeatable_move").repeat_last_move_next()
 end)
 map({ "n", "x", "o" }, ",", function()
-	require("nvim-treesitter-textobjects.repeatable_move").repeat_last_move_previous()
+	return require("nvim-treesitter-textobjects.repeatable_move").repeat_last_move_previous()
 end)
 
 -- Optionally, make builtin f, F, t, T also repeatable with ; and ,
